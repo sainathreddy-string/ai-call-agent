@@ -3,13 +3,68 @@ import asyncio
 import edge_tts
 
 
-VOICE = "en-US-AriaNeural"
+VOICES = {
+    "en": "en-US-AriaNeural",
+    "te": "te-IN-ShrutiNeural",
+    "hi": "hi-IN-SwaraNeural",
+}
 
 
-async def generate_speech(text: str, output_file: str) -> None:
-    communicate = edge_tts.Communicate(text, VOICE)
-    await communicate.save(output_file)
+def get_voice(language: str) -> str:
+    """
+    Return the Edge TTS voice for the detected language.
+    """
+
+    language = (
+        language or "en"
+    ).lower()
+
+    return VOICES.get(
+        language,
+        VOICES["en"],
+    )
 
 
-def text_to_speech(text: str, output_file: str) -> None:
-    asyncio.run(generate_speech(text, output_file))
+async def generate_speech(
+    text: str,
+    output_file: str,
+    language: str = "en",
+) -> None:
+
+    voice = get_voice(
+        language
+    )
+
+    print(
+        "TTS language:",
+        language,
+    )
+
+    print(
+        "TTS voice:",
+        voice,
+    )
+
+    communicate = edge_tts.Communicate(
+        text,
+        voice,
+    )
+
+    await communicate.save(
+        output_file
+    )
+
+
+def text_to_speech(
+    text: str,
+    output_file: str,
+    language: str = "en",
+) -> None:
+
+    asyncio.run(
+        generate_speech(
+            text,
+            output_file,
+            language,
+        )
+    )
